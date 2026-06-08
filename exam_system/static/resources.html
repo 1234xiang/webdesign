@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知序—考公备考系统</title>
+    <meta name="description" content="更现代的公考备考中枢，整合错题、专注训练、时政、资料与社群协作。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans SC', 'sans-serif'],
+                        display: ['Space Grotesk', 'Noto Sans SC', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 30px 80px rgba(15, 23, 42, 0.18)'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="text-slate-800 antialiased">
+    <div class="ambient-bg"></div>
+    <div id="toast">操作成功</div>
+    <div id="sidebarBackdrop" class="sidebar-backdrop hidden lg:hidden"></div>
+
+    <div class="app-shell">
+        <aside id="appSidebar" class="sidebar-panel">
+            <div class="p-6">
+                <div class="brand-card">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-[0.36em] text-cyan-200/70">ZHIXU</p>
+                            <h1 class="mt-3 text-2xl font-extrabold text-white">知序—考公备考系统</h1>
+                            <p class="mt-2 text-sm text-slate-300">把刷题、复盘、专注和资讯整合进一个更有序的备考工作台。</p>
+                        </div>
+                        <button id="closeSidebarBtn" class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-slate-300 lg:hidden" type="button">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <div class="mt-6 flex items-center gap-4 rounded-[1.75rem] border border-white/10 bg-white/5 p-4">
+                        <div class="relative shrink-0">
+                            <img src="/static/img/bear_icon.jpg" class="h-16 w-16 rounded-2xl border border-white/10 object-cover shadow-glow" alt="头像" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=Bear'">
+                            <span class="absolute -bottom-2 -right-2 rounded-full border border-white/10 bg-cyan-400 px-2 py-1 text-[10px] font-bold text-slate-950">PRO</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs uppercase tracking-[0.3em] text-slate-500">知序</p>
+                            <p id="currentUserBadge" class="mt-1 truncate text-sm font-bold text-white">访客模式</p>
+                            <p id="countdown" class="mt-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] text-slate-300">倒计时加载中...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto px-4 pb-5 custom-scrollbar">
+                <div class="space-y-2">
+                    <a href="/" class="nav-btn" data-target="dashboard">
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+                        <span>全景数据大屏</span>
+                    </a>
+                    <a href="/mistakes" class="nav-btn" data-target="mistakes">
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                        <span>核心错题本</span>
+                    </a>
+                    <a href="/checkin" class="nav-btn" data-target="checkin">
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <span>番茄计时打卡</span>
+                    </a>
+                </div>
+
+                <div class="my-5 border-t border-white/10"></div>
+                <p class="px-3 text-[11px] uppercase tracking-[0.35em] text-slate-500">拓展模块</p>
+
+                <div class="mt-3 space-y-2">
+                    <a href="/politics" class="nav-btn" data-target="politics">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 20l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v15z"></path></svg>
+                        <span>每日时政新闻</span>
+                    </a>
+                    <a href="/idioms" class="nav-btn" data-target="idioms">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477-4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        <span>备考名言生词</span>
+                    </a>
+                    <a href="/forum" class="nav-btn" data-target="forum">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+                        <span>互动交流论坛</span>
+                    </a>
+                    <a href="/resources" class="nav-btn active-nav" data-target="resources">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <span>资料分享中心</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="p-4">
+                <div class="rounded-[1.75rem] border border-white/10 bg-white/5 p-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.3em] text-slate-500">System</p>
+                            <p class="mt-1 text-sm font-bold text-white">知序工作台</p>
+                        </div>
+                        <span id="syncBadge" class="status-pill bg-white/10 text-slate-200">待同步</span>
+                    </div>
+                    <p id="connection-status" class="mt-3 text-xs leading-6 text-slate-400">等待连接后端...</p>
+                    <button id="adminLoginBtn" class="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3 text-xs font-bold text-slate-300 transition hover:border-cyan-400/40 hover:text-white" type="button">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        <span id="adminBtnText">登录知序</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex min-w-0 flex-1 flex-col">
+            <header class="topbar-shell">
+                <div class="flex items-center gap-3">
+                    <button id="mobileMenuBtn" class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200/70 bg-white text-slate-700 shadow-sm lg:hidden" type="button">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <div>
+                        <p class="text-xs uppercase tracking-[0.32em] text-slate-400">Workspace</p>
+                        <h2 id="currentSectionLabel" class="text-lg font-bold text-slate-900">全景数据大屏</h2>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="hidden rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-xs font-bold text-cyan-700 sm:inline-flex">知序界面</span>
+                    <span class="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600">实时联动</span>
+                </div>
+            </header>
+
+            <main class="main-surface custom-scrollbar">
+                <section id="resources" class="tab-content active space-y-6">
+                    <div class="section-banner">
+                        <div>
+                            <p class="text-xs uppercase tracking-[0.34em] text-teal-500">Resource Exchange</p>
+                            <h2 class="mt-2 text-3xl font-bold text-slate-900">备考资料共享</h2>
+                            <p class="mt-2 text-sm text-slate-500">支持图文分享，让资料与笔记不再分散。</p>
+                        </div>
+                        <button id="openResourceModalBtn" class="teal-btn inline-flex items-center gap-2" type="button">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            上传分享资料
+                        </button>
+                    </div>
+                    <div id="resourceGrid" class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <div id="loginModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-md">
+        <div class="modal-card w-full max-w-sm">
+            <div class="mb-8 text-center">
+                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                    <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800">身份验证</h3>
+                <p class="mt-2 text-sm text-slate-500">保护数据安全，管理内容生态</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-8 space-y-4">
+                    <input type="text" id="loginUsername" required class="form-input" placeholder="输入任意名字 (如: 小明)">
+                    <input type="password" id="loginPassword" class="form-input" placeholder="密码 (普通用户可随便输)">
+                </div>
+                <button type="submit" class="primary-btn w-full">确认身份</button>
+                <button type="button" id="closeLoginBtn" class="mt-3 w-full rounded-xl py-2 text-sm font-medium text-slate-500 transition hover:bg-slate-50">暂不登录</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="mistakeModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-md">
+        <div class="modal-card w-full max-w-lg">
+            <h3 class="mb-8 text-center text-2xl font-bold text-slate-800">✍️ 录入新错题</h3>
+            <form id="mistakeForm">
+                <div class="mb-5 grid grid-cols-2 gap-6">
+                    <select id="mSubject" class="form-select">
+                        <option value="行测">行测</option>
+                        <option value="申论">申论</option>
+                    </select>
+                    <select id="mModule" class="form-select">
+                        <option value="资料分析">资料分析</option>
+                        <option value="数量关系">数量关系</option>
+                        <option value="言语理解">言语理解</option>
+                        <option value="判断推理">判断推理</option>
+                    </select>
+                </div>
+                <div class="mb-5 flex flex-wrap items-center gap-5 rounded-xl bg-slate-50 p-4">
+                    <span class="text-sm font-medium text-slate-500">难度评级:</span>
+                    <label class="flex items-center gap-2 text-sm"><input type="radio" name="mDifficulty" value="简单" class="accent-indigo-500"> 简单</label>
+                    <label class="flex items-center gap-2 text-sm"><input type="radio" name="mDifficulty" value="中等" checked class="accent-indigo-500"> 中等</label>
+                    <label class="flex items-center gap-2 text-sm"><input type="radio" name="mDifficulty" value="困难" class="accent-indigo-500"> 困难</label>
+                </div>
+                <div class="mb-5">
+                    <label class="mb-2 block text-sm font-medium text-slate-500">附加错题图片 (可选):</label>
+                    <input type="file" id="mImage" accept="image/*" class="w-full cursor-pointer text-sm text-slate-500 file:mr-4 file:rounded-xl file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100">
+                    <div id="imagePreviewContainer" class="relative mt-3 hidden max-h-40 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                        <img id="mImagePreview" src="" class="max-h-40 object-contain">
+                        <button type="button" id="clearImageBtn" class="absolute right-2 top-2 rounded-full bg-slate-900/50 p-1 text-white transition-colors hover:bg-red-500" title="移除图片">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <textarea id="mContent" rows="4" class="form-input mb-8" placeholder="请输入题目内容或简述..."></textarea>
+                <div class="flex justify-end gap-4">
+                    <button type="button" id="closeModalBtn" class="secondary-btn">取消</button>
+                    <button type="submit" class="primary-btn">提交保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="newsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-md">
+        <div class="modal-card relative max-h-[85vh] w-full max-w-2xl overflow-y-auto p-8 md:p-10">
+            <button type="button" id="closeNewsBtn" class="absolute right-6 top-6 z-10 rounded-full bg-white p-2 text-slate-400 shadow-sm transition-colors hover:bg-red-50 hover:text-red-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="mb-6 border-b border-slate-100 pb-6 pr-8">
+                <div class="mb-4 flex items-center gap-3">
+                    <span id="newsDetailSource" class="rounded-full bg-red-50 px-3 py-1.5 text-xs font-bold tracking-widest text-red-600">来源</span>
+                    <span id="newsDetailTime" class="text-xs font-medium text-slate-400">时间</span>
+                </div>
+                <h3 id="newsDetailTitle" class="text-2xl font-extrabold leading-snug text-slate-800 md:text-3xl">新闻标题加载中...</h3>
+            </div>
+            <img id="newsDetailImage" src="" class="mb-6 hidden h-48 w-full rounded-2xl object-cover shadow-sm md:h-64" alt="新闻配图">
+            <div id="newsDetailContent" class="space-y-5 text-sm leading-loose text-slate-600 md:text-base"></div>
+            <div class="mt-8 border-t border-slate-100 pt-6 text-center">
+                <p class="text-xs text-slate-400">© 知序 - 每日时政推送</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="idiomModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-md">
+        <div class="modal-card relative w-full max-w-md p-8 md:p-10">
+            <button type="button" id="closeIdiomBaseBtn" class="absolute right-6 top-6 rounded-full p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="mb-6 text-center">
+                <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold tracking-widest text-amber-600">高频成语</span>
+                <h3 id="idiomDetailWord" class="mt-4 text-4xl font-extrabold tracking-widest text-slate-800">成语</h3>
+                <p id="idiomDetailPinyin" class="mt-2 font-mono text-slate-400">pīn yīn</p>
+            </div>
+            <div class="space-y-4 rounded-2xl bg-slate-50 p-6 text-sm leading-relaxed text-slate-700">
+                <p><strong>【释义】</strong> <span id="idiomDetailMeaning"></span></p>
+                <p><strong>【近义词】</strong> <span id="idiomDetailSynonyms" class="text-indigo-600"></span></p>
+                <div class="mt-3 border-t border-slate-200 pt-3">
+                    <p class="italic text-slate-500">" <span id="idiomDetailExample"></span> "</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resourceModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-md">
+        <div class="modal-card relative w-full max-w-lg">
+            <h3 class="mb-6 text-center text-2xl font-bold text-slate-800">📤 分享备考资料</h3>
+            <form id="resourceForm">
+                <textarea id="rContent" rows="3" required class="form-input mb-5 text-sm" placeholder="描述一下这份资料，或者直接粘贴纯文本笔记..."></textarea>
+                <div class="mb-8">
+                    <label class="mb-2 block text-sm font-medium text-slate-500">上传资料截图 (选填，建议小于1MB):</label>
+                    <input type="file" id="rImage" accept="image/*" class="w-full cursor-pointer text-sm text-slate-500 file:mr-4 file:rounded-xl file:border-0 file:bg-teal-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-teal-700 hover:file:bg-teal-100">
+                    <div id="rImagePreviewContainer" class="relative mt-3 hidden max-h-40 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                        <img id="rImagePreview" src="" class="max-h-40 object-contain">
+                        <button type="button" id="clearRImageBtn" class="absolute right-2 top-2 rounded-full bg-slate-900/50 p-1 text-white transition-colors hover:bg-red-500">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" id="closeResourceBtn" class="secondary-btn">取消</button>
+                    <button type="submit" class="teal-btn">确认分享</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/core/shared-module.js"></script>
+    <script src="/static/js/idioms-module.js"></script>
+    <script src="/static/js/news-module.js"></script>
+    <script src="/static/js/mistakes-module.js"></script>
+    <script src="/static/js/forum-module.js"></script>
+    <script src="/static/js/resources-module.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
+
+
+
