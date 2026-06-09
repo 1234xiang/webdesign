@@ -8,8 +8,10 @@ app = Flask(__name__, static_folder='static', static_url_path='/static')
 CORS(app)
 
 # 注册所有模块
-init_db()
-init_db()
+if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+    init_db()
+
+# 注册所有业务接口
 init_app(app)
 
 @app.route('/')
